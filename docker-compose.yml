@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  ftp-server:
+    build: .
+    container_name: vsftpd-server
+    ports:
+      # FTPコントロールポート
+      - "21:21"
+      # パッシブモード用ポート範囲
+      - "21100-21110:21100-21110"
+    environment:
+      # FTPユーザー設定
+      - FTP_USER=${FTP_USER:-ftpuser}
+      - FTP_PASS=${FTP_PASS:-ftppass}
+      - FTP_UID=${FTP_UID:-1000}
+      - FTP_GID=${FTP_GID:-1000}
+      
+      # 匿名アクセス設定
+      - ANONYMOUS_ENABLE=${ANONYMOUS_ENABLE:-YES}
+      - ANON_UPLOAD_ENABLE=${ANON_UPLOAD_ENABLE:-NO}
+      - ANON_MKDIR_WRITE_ENABLE=${ANON_MKDIR_WRITE_ENABLE:-NO}
+      
+      # ローカルユーザー設定
+      - LOCAL_ENABLE=${LOCAL_ENABLE:-YES}
+      - WRITE_ENABLE=${WRITE_ENABLE:-YES}
+      
+      # パッシブモード設定
+      - PASV_MIN_PORT=${PASV_MIN_PORT:-21100}
+      - PASV_MAX_PORT=${PASV_MAX_PORT:-21110}
+      - PASV_ADDRESS=${PASV_ADDRESS:-}
+      
+      # SSL/TLS設定
+      - SSL_ENABLE=${SSL_ENABLE:-NO}
+      - IMPLICIT_SSL=${IMPLICIT_SSL:-NO}
+    volumes:
+      # 匿名ユーザー用のディレクトリ
+      - ./data/ftp:/var/ftp:rw
+      # 認証ユーザー用のディレクトリ
+      - ./data/home:/home:rw
+    restart: unless-stopped
+    cap_add:
+      - NET_BIND_SERVICE

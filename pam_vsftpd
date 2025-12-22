@@ -1,0 +1,10 @@
+# PAM configuration for vsftpd
+
+# Allow anonymous access
+auth sufficient pam_permit.so
+account sufficient pam_permit.so
+
+# Standard Unix authentication for local users
+auth required pam_unix.so
+account required pam_unix.so
+session required pam_unix.so
